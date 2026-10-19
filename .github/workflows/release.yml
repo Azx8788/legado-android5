@@ -1,0 +1,81 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: '版本号，例如 4.0.0-android5'
+        required: true
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 17
+          cache: gradle
+
+      - name: Prepare signing
+        env:
+          KEYSTORE_BASE64: ${{ secrets.RELEASE_KEYSTORE_BASE64 }}
+          STORE_PASSWORD: ${{ secrets.RELEASE_STORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
+        run: |
+          if [ -z "$KEYSTORE_BASE64" ]; then
+            echo "::error::RELEASE_KEYSTORE_BASE64 is empty"
+            exit 1
+          fi
+          echo "$KEYSTORE_BASE64" | base64 -d > app/legado.keystore
+          {
+            echo ""
+            echo "RELEASE_STORE_FILE=./legado.keystore"
+            echo "RELEASE_KEY_ALIAS=$KEY_ALIAS"
+            echo "RELEASE_STORE_PASSWORD=$STORE_PASSWORD"
+            echo "RELEASE_KEY_PASSWORD=$KEY_PASSWORD"
+          } >> gradle.properties
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Assemble appRelease
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleAppRelease --build-cache --parallel --warning-mode all
+
+      - name: Organize APKs
+        run: |
+          mkdir -p "${{ github.workspace }}/apk"
+          for file in app/build/outputs/apk/*/*/*.apk; do
+            [ -f "$file" ] || continue
+            base=$(basename "$file" .apk)
+            abi=$(echo "$base" | grep -oE 'arm64-v8a|armeabi-v7a|x86_64' || true)
+            [ -z "$abi" ] && abi="universal"
+            cp "$file" "${{ github.workspace }}/apk/legado-android5_${abi}.apk"
+          done
+          ls -lh "${{ github.workspace }}/apk"
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ inputs.version || github.ref_name }}
+          name: Legado Android 5 ${{ inputs.version || github.ref_name }}
+          draft: false
+          prerelease: false
+          files: ${{ github.workspace }}/apk/*.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
