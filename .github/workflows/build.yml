@@ -68,7 +68,7 @@ jobs:
           ls -lh "${{ github.workspace }}/apk"
 
       - name: Upload APK
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: legado-android5-apk
           path: ${{ github.workspace }}/apk/*.apk
