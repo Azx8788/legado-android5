@@ -48,7 +48,7 @@ jobs:
           } >> gradle.properties
 
       - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6
 
       - name: Assemble appRelease
         run: |
