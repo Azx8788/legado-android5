@@ -70,7 +70,7 @@ jobs:
           ls -lh "${{ github.workspace }}/apk"
 
       - name: Create Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ inputs.version || github.ref_name }}
           name: Legado Android 5 ${{ inputs.version || github.ref_name }}
