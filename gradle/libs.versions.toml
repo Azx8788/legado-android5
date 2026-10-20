@@ -4,6 +4,7 @@ kotlin = "2.3.0"
 ksp = "2.3.4"
 agp = "8.13.2"
 appcompat = "1.7.1"
+startup = "1.2.0"
 colorpicker = "1.1.0"
 constraintlayout = "2.2.1"
 core = "1.17.0"
@@ -89,6 +90,8 @@ androidx-constraintlayout = { module = "androidx.constraintlayout:constraintlayo
 
 core-core = { module = "androidx.core:core", version.ref = "core" }
 core-ktx = { module = "androidx.core:core-ktx", version.ref = "core" }
+
+androidx-startup-runtime = { module = "androidx.startup:startup-runtime", version.ref = "startup" }
 
 androidx-espresso-core = { module = "androidx.test.espresso:espresso-core", version = "3.6.1" }
 

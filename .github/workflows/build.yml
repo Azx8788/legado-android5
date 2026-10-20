@@ -77,5 +77,7 @@ jobs:
       - name: Lint (NewApi check)
         run: |
           chmod +x gradlew
-          ./gradlew lintAppRelease --warning-mode summary
+          ./gradlew lintAppRelease --warning-mode summary || true
+          echo "=== FULL LINT REPORT (errors only) ==="
+          find app/build -name "lint-results-*.txt" -path "*lintReport*" -exec grep -B1 -A4 "Error:" {} \; 2>/dev/null | head -200 || true
         continue-on-error: true
