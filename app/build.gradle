@@ -147,6 +147,9 @@ android {
     }
     lint {
         checkDependencies = true
+        checkOnly 'NewApi'
+        fatal 'NewApi'
+        abortOnError = true
     }
     tasks.withType(JavaCompile).tap {
         configureEach {

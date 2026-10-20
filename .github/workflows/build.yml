@@ -74,10 +74,7 @@ jobs:
           path: ${{ github.workspace }}/apk/*.apk
           retention-days: 30
 
-      - name: Lint (NewApi check)
+      - name: Lint NewApi gate
         run: |
           chmod +x gradlew
-          ./gradlew lintAppRelease --warning-mode summary || true
-          echo "=== FULL LINT REPORT (errors only) ==="
-          find app/build -name "lint-results-*.txt" -path "*lintReport*" -exec grep -B1 -A4 "Error:" {} \; 2>/dev/null | head -200 || true
-        continue-on-error: true
+          ./gradlew lintAppRelease --warning-mode summary
