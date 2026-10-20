@@ -21,8 +21,7 @@ I created this project for this application, so that when it's opened, there are
 需要手动下载新版APK安装覆盖。
 
 ### Q5：能否和官方版共存安装？
-如果使用的是"共存版(releaseA)"可以同时安装；如果是普通版，
-由于包名/签名可能一致，需要先卸载旧版本再安装。
+可以。本版包名与官方版不同（io.legado.app.android5），可以同时安装共存。
 
 ### Q6：书源突然失效了怎么办？
 书源依赖的网站可能随时改版或关闭，导致规则失效属于正常现象，

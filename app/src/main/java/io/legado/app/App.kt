@@ -84,8 +84,10 @@ class App : Application() {
             LogUtils.init(this@App)
             LogUtils.d("App", "onCreate")
             LogUtils.logDeviceInfo()
-            //预下载Cronet so
-            Cronet.preDownload()
+            //预下载Cronet so（Cronet minSdk=24，API 21-23 跳过下载，回退 OkHttp）
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                Cronet.preDownload()
+            }
             createNotificationChannels()
             LiveEventBus.config()
                 .lifecycleObserverAlwaysActive(true)
