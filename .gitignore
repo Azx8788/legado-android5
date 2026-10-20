@@ -22,3 +22,6 @@ package-lock.json
 *.jks
 *.p12
 *.pfx
+
+# Firebase config (not used in this fork)
+google-services.json
