@@ -1018,16 +1018,17 @@ class ObsoleteUrlFactory(private var client: OkHttpClient) : URLStreamHandlerFac
         )
         val UTC: TimeZone = TimeZone.getTimeZone("GMT")
         const val HTTP_CONTINUE = 100
-        val STANDARD_DATE_FORMAT: ThreadLocal<DateFormat> = ThreadLocal.withInitial {
-
-            // Date format specified by RFC 7231 section 7.1.1.1.
-            val rfc1123: DateFormat = SimpleDateFormat(
-                "EEE, dd MMM yyyy HH:mm:ss 'GMT'",
-                Locale.US
-            )
-            rfc1123.isLenient = false
-            rfc1123.timeZone = UTC
-            rfc1123
+        val STANDARD_DATE_FORMAT: ThreadLocal<DateFormat> = object : ThreadLocal<DateFormat>() {
+            override fun initialValue(): DateFormat {
+                // Date format specified by RFC 7231 section 7.1.1.1.
+                val rfc1123: DateFormat = SimpleDateFormat(
+                    "EEE, dd MMM yyyy HH:mm:ss 'GMT'",
+                    Locale.US
+                )
+                rfc1123.isLenient = false
+                rfc1123.timeZone = UTC
+                return rfc1123
+            }
         }
         private val FIELD_NAME_COMPARATOR =
             java.util.Comparator { a: String?, b: String? ->

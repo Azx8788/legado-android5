@@ -73,3 +73,9 @@ jobs:
           name: legado-android5-apk
           path: ${{ github.workspace }}/apk/*.apk
           retention-days: 30
+
+      - name: Lint (NewApi check)
+        run: |
+          chmod +x gradlew
+          ./gradlew lintAppRelease --warning-mode summary
+        continue-on-error: true

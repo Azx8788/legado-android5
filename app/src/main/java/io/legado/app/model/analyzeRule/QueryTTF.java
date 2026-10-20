@@ -2,6 +2,8 @@ package io.legado.app.model.analyzeRule;
 
 import androidx.annotation.Keep;
 
+import android.text.TextUtils;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
@@ -921,7 +923,7 @@ public class QueryTTF {
             for (int i = 0; i < dataCount; i++) {
                 coordinateArray[i] = glyph.glyphSimple.xCoordinates[i] + "," + glyph.glyphSimple.yCoordinates[i];
             }
-            glyphString = String.join("|", coordinateArray);
+            glyphString = TextUtils.join("|", coordinateArray);
         } else {
             // 复合字形
             LinkedList<String> glyphIdList = new LinkedList<>();
@@ -936,7 +938,7 @@ public class QueryTTF {
                         "scale10:" + g.scale10 + "," +
                         "yScale:" + g.yScale + "}");
             }
-            glyphString = "[" + String.join(",", glyphIdList) + "]";
+            glyphString = "[" + TextUtils.join(",", glyphIdList.toArray(new String[0])) + "]";
         }
         return glyphString;
     }
