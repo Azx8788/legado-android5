@@ -74,6 +74,11 @@ jobs:
           path: ${{ github.workspace }}/apk/*.apk
           retention-days: 30
 
+      - name: JVM unit tests
+        run: |
+          chmod +x gradlew
+          ./gradlew testAppReleaseUnitTest --build-cache --parallel
+
       - name: Lint NewApi gate
         run: |
           chmod +x gradlew
