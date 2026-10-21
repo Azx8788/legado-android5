@@ -3,6 +3,7 @@ package io.legado.app.help
 import io.legado.app.constant.AppConst
 import io.legado.app.data.appDb
 import io.legado.app.data.entities.DictRule
+import io.legado.app.data.entities.BookSource
 import io.legado.app.data.entities.HttpTTS
 import io.legado.app.data.entities.KeyboardAssist
 import io.legado.app.data.entities.RssSource
@@ -21,6 +22,19 @@ import java.io.File
 
 object DefaultData {
 
+    /**
+     * 内置书源清单版本。新增或调整内置书源后递增该值，升级时会自动补齐缺失项。
+     */
+    private const val CURRENT_BOOK_SOURCE_VERSION = 1
+
+    /**
+     * 已知失效的内置书源。首次补齐时置为禁用，之后用户手动启用不会被覆盖。
+     */
+    private val knownUnavailableBookSourceUrls = setOf(
+        "http://www.80zw.la",
+        "光遇聚合"
+    )
+
     fun upVersion() {
         if (LocalConfig.versionCode < AppConst.appInfo.versionCode) {
             Coroutine.async {
@@ -35,6 +49,9 @@ object DefaultData {
                 }
                 if (LocalConfig.needUpDictRule) {
                     importDefaultDictRules()
+                }
+                if (LocalConfig.bookSourceVersion < CURRENT_BOOK_SOURCE_VERSION) {
+                    importDefaultBookSources()
                 }
             }.onError {
                 it.printOnDebug()
@@ -127,6 +144,33 @@ object DefaultData {
 
     fun importDefaultDictRules() {
         appDb.dictRuleDao.insert(*dictRules.toTypedArray())
+    }
+
+    /**
+     * 按 url 补齐缺失的内置书源。
+     * 已存在的书源跳过，避免覆盖用户对内置书源的改名、停用或规则修改。
+     */
+    fun importDefaultBookSources() {
+        val isFirstMigration = LocalConfig.bookSourceVersion == 0
+        val json = String(
+            appCtx.assets.open("defaultData${File.separator}bookSources.json").readBytes()
+        )
+        val sources = GSON.fromJsonArray<BookSource>(json).getOrDefault(emptyList())
+        val missing = sources.filter { !appDb.bookSourceDao.has(it.bookSourceUrl) }
+        if (missing.isNotEmpty()) {
+            appDb.bookSourceDao.insert(*missing.toTypedArray())
+        }
+        if (isFirstMigration) {
+            knownUnavailableBookSourceUrls.forEach { url ->
+                appDb.bookSourceDao.getBookSource(url)?.let { source ->
+                    if (source.enabled) {
+                        source.enabled = false
+                        appDb.bookSourceDao.update(source)
+                    }
+                }
+            }
+        }
+        LocalConfig.bookSourceVersion = CURRENT_BOOK_SOURCE_VERSION
     }
 
 }

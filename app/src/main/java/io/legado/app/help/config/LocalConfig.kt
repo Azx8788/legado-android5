@@ -71,6 +71,15 @@ by appCtx.getSharedPreferences("local", Context.MODE_PRIVATE) {
     val needUpDictRule: Boolean
         get() = !isLastVersion(2, "needUpDictRule")
 
+    /**
+     * 内置书源版本。升级时按 url 补齐缺失的内置书源，已存在的书源不覆盖。
+     */
+    var bookSourceVersion
+        get() = getInt("bookSourceVersion", 0)
+        set(value) {
+            edit { putInt("bookSourceVersion", value) }
+        }
+
     var versionCode
         get() = getLong(versionCodeKey, 0)
         set(value) {

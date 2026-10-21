@@ -20,8 +20,6 @@ import io.legado.app.constant.AppConst.channelIdDownload
 import io.legado.app.constant.AppConst.channelIdReadAloud
 import io.legado.app.constant.AppConst.channelIdWeb
 import io.legado.app.constant.PreferKey
-import com.google.gson.reflect.TypeToken
-import io.legado.app.utils.GSON
 import io.legado.app.data.appDb
 import io.legado.app.data.entities.Book
 import io.legado.app.data.entities.BookChapter
@@ -95,20 +93,6 @@ class App : Application() {
                 .enableLogger(BuildConfig.DEBUG || AppConfig.recordLog)
                 .setLogger(EventLogger())
             DefaultData.upVersion()
-            if (!getPrefBoolean("defaultBookSourceImported", false)) {
-                val json = assets.open("defaultData/bookSources.json")
-                    .bufferedReader()
-                    .readText()
-                val type = object : TypeToken<List<BookSource>>() {}.type
-                val sources: List<BookSource> =
-                    GSON.fromJson(json, type) ?: emptyList()
-                if (sources.isNotEmpty()) {
-                    appDb.bookSourceDao.insert(*sources.toTypedArray())
-                }
-                defaultSharedPreferences.edit()
-                    .putBoolean("defaultBookSourceImported", true)
-                    .apply()
-            }
             AppFreezeMonitor.init(this@App)
             DispatchersMonitor.init()
             URL.setURLStreamHandlerFactory(ObsoleteUrlFactory(okHttpClient))
