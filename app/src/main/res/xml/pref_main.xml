@@ -73,6 +73,12 @@
 
         <io.legado.app.lib.prefs.Preference
             android:icon="@drawable/ic_cfg_other"
+            android:key="clickRegionalConfig"
+            android:title="@string/click_regional_config"
+            app:iconSpaceReserved="false" />
+
+        <io.legado.app.lib.prefs.Preference
+            android:icon="@drawable/ic_cfg_other"
             android:key="setting"
             android:summary="@string/other_setting_s"
             android:title="@string/other_setting"
