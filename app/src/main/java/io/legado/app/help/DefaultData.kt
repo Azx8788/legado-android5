@@ -50,9 +50,15 @@ object DefaultData {
                 if (LocalConfig.needUpDictRule) {
                     importDefaultDictRules()
                 }
-                if (LocalConfig.bookSourceVersion < CURRENT_BOOK_SOURCE_VERSION) {
-                    importDefaultBookSources()
-                }
+            }.onError {
+                it.printOnDebug()
+            }
+        }
+        // 书源补齐不依赖 versionCode：MainActivity 启动后会立即把 versionCode
+        // 写成当前值，与本方法所在的异步协程存在竞态，放在上面的条件内可能被整体跳过。
+        if (LocalConfig.bookSourceVersion < CURRENT_BOOK_SOURCE_VERSION) {
+            Coroutine.async {
+                importDefaultBookSources()
             }.onError {
                 it.printOnDebug()
             }
